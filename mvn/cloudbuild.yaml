@@ -2,115 +2,18 @@
 # $ gcloud builds submit
 
 steps:
-# Build old tagged images.
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=MAVEN_VERSION=3.3.9-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
-  - '.'
-  waitFor: ['-']
-  id: '339'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=MAVEN_VERSION=3.5.0-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  - '.'
-  waitFor: ['-']
-  id: '350'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=MAVEN_VERSION=3.8-jdk-8'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
-  - '.'
-  waitFor: ['-']
-  id: '3.8'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=MAVEN_VERSION=3.9.1'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:3.9.1'
-  - '.'
-  waitFor: ['-']
-  id: '3.9'
-
-# Build the :latest version. Which points to version 3.8 currently.
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'build'
-  - '--build-arg=MAVEN_VERSION=3.8-openjdk-18'
-  - '--tag=gcr.io/$PROJECT_ID/mvn'
-  - '.'
-  waitFor: ['-']
-  id: 'latest'
-
 # Build the App Engine version with python support for gcloud.
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'build'
-  - '--build-arg=PROJECT_ID=${PROJECT_ID}'
   - '--build-arg=MAVEN_VERSION=3.9.1'
   - '-f'
   - 'Dockerfile.appengine'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:gcloud'
-  - '--tag=gcr.io/$PROJECT_ID/mvn:appengine'
+  - '--tag=us-central1-docker.pkg.dev/$PROJECT_ID/custom-builder/mvn:appengine-java17'
   - '.'
-  waitFor: ['3.9']
   id: 'gcloud'
 
-# Minimally invoke Maven.
-- name: 'gcr.io/$PROJECT_ID/mvn'
-  args: ['--version']
-  waitFor: ['latest']
-
-# Run example builds.
-- name: 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn:3.9.1'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn:gcloud'
-  args: ['install']
-  dir: 'examples/spring_boot'
-- name: 'gcr.io/$PROJECT_ID/mvn:appengine'
-  args: ['package', 'appengine:stage']
-  dir: 'examples/hello_appengine'
-
-# Check for jdk17 compatibility
-- name: 'gcr.io/$PROJECT_ID/mvn:3.9.1'
-  args: ['install']
-  dir: 'examples/jdk17'
-- name: 'gcr.io/$PROJECT_ID/mvn'
-  args: ['install']
-  dir: 'examples/jdk17'
-- name: 'gcr.io/$PROJECT_ID/mvn:gcloud'
-  args: ['install']
-  dir: 'examples/jdk17'
-
-# Demonstrate using the maven image directly.
-- name: 'maven'
-  args: ['mvn', 'install']
-  dir: 'examples/spring_boot'
-
 images:
-- 'gcr.io/$PROJECT_ID/mvn:3.3.9-jdk-8'
-- 'gcr.io/$PROJECT_ID/mvn:3.5.0-jdk-8'
-- 'gcr.io/$PROJECT_ID/mvn:3.8-jdk-8'
-- 'gcr.io/$PROJECT_ID/mvn:3.9.1'
-- 'gcr.io/$PROJECT_ID/mvn:gcloud'
-- 'gcr.io/$PROJECT_ID/mvn:appengine'
-- 'gcr.io/$PROJECT_ID/mvn'
+- 'us-central1-docker.pkg.dev/$PROJECT_ID/custom-builder/mvn:appengine-java17'
 
 timeout: 2400s
