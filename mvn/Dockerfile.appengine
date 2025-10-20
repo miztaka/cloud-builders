@@ -1,6 +1,7 @@
 ARG PROJECT_ID="cloud-builders"
 ARG MAVEN_VERSION=latest
-FROM gcr.io/${PROJECT_ID}/mvn:${MAVEN_VERSION}
+# FROM gcr.io/${PROJECT_ID}/mvn:${MAVEN_VERSION}
+FROM maven:${MAVEN_VERSION}
 
 # install python
 RUN apt-get update -y && apt-get install python3 -y
